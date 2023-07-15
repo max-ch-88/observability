@@ -1,0 +1,117 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "88e9a966-d8fd-4ca7-b6e6-50c0aead2b2b",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        920,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://api.open-notify.org/iss-now.json",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "cb647803-85ea-4f6c-96a5-0a35fb418516",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1140,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const metric = items[0].json;\nconst arr = [];\narr[0]='location{app=\"iss\",iss_position=\"longitude\"} ' + metric.body.iss_position.longitude + ' ' + metric.body.timestamp;\narr[1]='location{app=\"iss\",iss_position=\"latitude\"} ' + metric.body.iss_position.latitude + ' ' + metric.body.timestamp;\narr[2]='location{app=\"iss\",message=\"' + metric.body.message +'\"} ' + metric.statusCode + ' ' + metric.body.timestamp;\ndata = arr.join('\\n');\nreturn {data};"
+      },
+      "id": "7ec14e50-259c-4fe8-b3a4-fdc0fd8892a5",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        560
+      ],
+      "notesInFlow": false,
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "convertAllData": false,
+        "options": {
+          "fileName": "example.txt",
+          "useRawData": true
+        }
+      },
+      "id": "47204d06-b1d4-4151-9bcb-b302fe9b2cd2",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        560
+      ],
+      "alwaysOutputData": true,
+      "notesInFlow": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "591bd7f6-363d-4d8a-9d7d-014a5c45f301",
+  "id": "2",
+  "meta": {
+    "instanceId": "0bd53b2a947661acbe10179053b9153b2b6a1b42f11dfd760aea0c489eb17a3b"
+  },
+  "tags": []
+}
