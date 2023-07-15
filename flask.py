@@ -1,20 +1,21 @@
-# Output response code, response time, page title to Prometheus metrics
-import requests
+"""Output response code, response time, page title to Prometheus metrics."""
 import re
+import requests
 
-url = 'http://localhost:5050'
+URL = 'http://localhost:5050'
 
-response = requests.get(url)
+response = requests.get(URL,timeout=10000)
 result = re.search(r"<title>(.*)<\/title>", response.text)
-print('response_code{{app="flask",method="get",title="{0}"}} {1}'.format(result.group(1), response.status_code))
-print('response_latency{{app="flask",method="get"}} {0}'.format(response.elapsed.total_seconds()))
+print(f'response_code{{app="flask",method="get",title="{result.group(1)}"}} {response.status_code}')
+print(f'response_latency{{app="flask",method="get"}} {response.elapsed.total_seconds()}')
 
-response = requests.post(f'{url}/update')
+response = requests.post(f'{URL}/update',timeout=10000)
 result = re.search(r"<title>(.*)<\/title>", response.text)
-print('response_code{{app="flask",method="update",title="{0}"}} {1}'.format(result.group(1), response.status_code))
-print('response_latency{{app="flask",method="update"}} {0}'.format(response.elapsed.total_seconds()))
+print(f'response_code{{app="flask",method="update",title="{result.group(1)}"}}',
+      f'{response.status_code}')
+print(f'response_latency{{app="flask",method="update"}} {response.elapsed.total_seconds()}')
 
-response = requests.post(f'{url}/add',data={'todo_item': ''})
+response = requests.post(f'{URL}/add',data={'todo_item': ''},timeout=10000)
 result = re.search(r"<title>(.*)<\/title>", response.text)
-print('response_code{{app="flask",method="add",title="{0}"}} {1}'.format(result.group(1), response.status_code))
-print('response_latency{{app="flask",method="add"}} {0}'.format(response.elapsed.total_seconds()))
+print(f'response_code{{app="flask",method="add",title="{result.group(1)}"}} {response.status_code}')
+print(f'response_latency{{app="flask",method="add"}} {response.elapsed.total_seconds()}')
